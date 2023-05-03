@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Заявки</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div>
+        <!--                <hr class="hr"/>-->
+        <h5>Поиск заявки</h5>
+        <form method="POST" th:action="@{/task/search}" th:object="${taskSearchForm}">
+            <div class="mt-0 row g-2">
+                <div class="col-md">
+                    <div class="form-floating">
+                        <input name="taskId" type="text" class="form-control " id="taskId"
+                               placeholder="ID заявки">
+                        <label for="taskId">ID заявки</label>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating">
+                        <input name="nameTask" type="text" class="form-control" id="nameTask"
+                               placeholder="Название заявки">
+                        <label for="nameTask">Название заявки</label>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating">
+                        <input name="userFio" type="text" class="form-control" id="userFio" placeholder="Автор заявки">
+                        <label for="userFio">Автор заявки</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-0 row g-2">
+                <div class="col-md">
+                    <div class="form-floating">
+                        <input name="workerFio" type="text" class="form-control" id="workerFio"
+                               placeholder="Исполнитель">
+                        <label for="workerFio">Исполнитель</label>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating">
+                        <select class="form-select " name="category" id="category">
+                            <option selected th:value="null">Выберите категорию заявки</option>
+                            <option th:each="categorys : ${taskSearch}"
+                                    th:value="${categorys}"
+                                    th:text="${categorys}">
+                            </option>
+                        </select>
+                        <label for="category">Категория заявки</label>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating">
+                        <select class="form-select" name="statusTask" id="statusTask">
+                            <option selected th:value="null">Выберете статус заявки</option>
+                            <option th:each="status : ${T(ru.sber.spring.java13springmy.sdproject.model.StatusTask).values()}"
+                                    th:value="${status}" th:text="${status.statusTaskTextDisplay()}"></option>
+                        </select>
+                        <label for="statusTask">Статус</label>
+                    </div>
+
+                </div>
+            </div>
+            <div class="form-check">
+                <!--                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">-->
+                <!--                <label class="form-check-label" for="flexCheckDefault">-->
+                <!--                    Просроченные заявки-->
+                <!--                </label>-->
+            </div>
+            <div class="col-md">
+                <div class="row g-2">
+                    <button type="submit" class="btn btn-secondary">Найти</button>
+                    <div sec:authorize="isAuthenticated() && (hasRole('MAIN_EXECUTOR') || hasRole('EXECUTOR'))">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a type="button" class="btn btn btn-outline-success"
+                               th:href="'/task/search/noAssign'">Нераспределённые</a>
+<!--                            <button class="btn btn-sm btn-outline-danger" type="button">Просроченные</button>-->
+                            <a type="button" class="btn btn btn-success"
+                               th:href="'/task/search/assignToMe'">Назначенные на меня</a>
+                            <a type="button" class="btn btn btn-success"
+                               th:href="'/task/search/myTask'">Мои заявки</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <hr class="mt-3 hr"/>
+    <div class="row">
+        <table class="table table">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Дата заявки</th>
+                <th scope="col">Тема заявки</th>
+                <th scope="col">Тип заявки</th>
+                <th scope="col">Категория</th>
+                <th scope="col">Приоритет</th>
+                <th scope="col">Автор</th>
+                <th scope="col">Исполнитель</th>
+                <th scope="col">Срок выполнения</th>
+                <th scope="col">Статус</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="tasks : ${task}">
+                <td>
+                    <!--                    <a class="text-link text-blue" th:href="'/task/' + ${tasks.getId()}"-->
+                    <a th:text="${tasks.getId()}">ID заявки</a>
+                </td>
+                <td th:text="${#temporals.format(tasks.getCreateDate(), 'dd.MM.yyyy HH:mm')}">Дата заявки</td>
+                <td style="max-width: 200px;">
+                    <a class="task-link"  th:href="'/task/' + ${tasks.getId()}"
+                       th:text="${tasks.getNameTask()}">Тема заявки</a>
+                </td>
+                <td th:text="${tasks.getTypeTask().getNameType()}">Тип заявки</td>
+                <td th:text="${tasks.getCategory().getNameCategory()}">Категория</td>
+                <td th:text="${tasks.getPriority().priorityTextDisplay()}">Категория</td>
+                <td>
+                    <!--                    <a class="text-link text-blue" th:href="'/users/' + ${tasks.getUser().getId()}"-->
+                    <a th:text="${tasks.getUser().getLastName() + ' ' + tasks.getUser().getFirstName().charAt(0) +
+                       '. ' + tasks.getUser().getMiddleName().charAt(0) + '.'}">Автор ФИО</a>
+                </td>
+                <td th:text="${tasks.getWorker().getId()} == 1 ? 'Не назначена' : ${tasks.getWorker().getLastName() + ' '
+                 + tasks.getWorker().getFirstName().charAt(0) +  '. ' + tasks.getWorker().getMiddleName().charAt(0) + '.'}">
+                    ФИО исполнителя
+                </td>
+                <td th:text="${#temporals.format(tasks.getEndDate(), 'dd.MM.yyyy HH:mm')}">Дата выполнения</td>
+                <td th:text="${tasks.getStatusTask().statusTaskTextDisplay()}">Статус</td>
+                <td>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <div sec:authorize="isAuthenticated() && (hasRole('EXECUTOR')|| hasRole('MAIN_EXECUTOR'))">
+                            <div class="btn-group" role="group" aria-label="Basic outlined example">
+                                <div th:if="${!(tasks.getStatusTask() eq  tasks.getStatusTask().COMPLETED) &&
+                                !(tasks.getStatusTask() eq  tasks.getStatusTask().CLOSED) &&
+                                !(tasks.getWorker.getId() eq userId)}">
+                                    <a type="button" class="btn btn-sm btn-success" id="takeTask"
+                                       th:href="'/task/takeTask/'+${tasks.id}">Взять</a>
+                                </div>
+                                <div th:if="${!(tasks.getStatusTask() eq  tasks.getStatusTask().COMPLETED) &&
+                                !(tasks.getStatusTask() eq  tasks.getStatusTask().CLOSED) &&
+                                !(tasks.getStatusTask() eq  tasks.getStatusTask().STOPPED)}">
+                                    <a type="button" class="btn btn-sm btn-danger" id="stopTask"
+                                       th:href="'/task/stopTask/' + ${tasks.id}">Остановить</a>
+                                </div>
+                                <div th:if="${!(tasks.getStatusTask() eq  tasks.getStatusTask().COMPLETED) &&
+                                !(tasks.getStatusTask() eq  tasks.getStatusTask().CLOSED) &&
+                                (tasks.getStatusTask() eq  tasks.getStatusTask().STOPPED)}">
+                                    <a type="button" class="btn btn-sm btn-danger" id="unstopTask"
+                                       th:href="'/task/unstopTask/' + ${tasks.id}">В работу</a>
+                                </div>
+                                <div th:if="${!(tasks.getStatusTask() eq  tasks.getStatusTask().COMPLETED) &&
+                                !(tasks.getStatusTask() eq  tasks.getStatusTask().CLOSED)}">
+                                    <a type="button" class="btn btn-sm btn-warning" id="executeTask"
+                                       th:href="'/task/executeTask/' + ${tasks.id}">Выполнить</a>
+                                </div>
+                                <a class="btn btn-sm btn-success" id="update"
+                                   th:href="'/task/update/' + ${tasks.id}">Обновить</a>
+                            </div>
+
+                        </div>
+                        <div sec:authorize="isAuthenticated() && (hasRole('USER'))">
+                            <div th:if="${(tasks.getStatusTask() eq  tasks.getStatusTask().COMPLETED)}">
+                                <a type="button" class="btn btn-sm btn-danger" id="noexecuteTask"
+                                   th:href="'/task/noexecuteTask/'+${tasks.id}">Не выполнена</a>
+                            </div>
+                        </div>
+                        <div sec:authorize="isAuthenticated() && (hasRole('USER'))">
+                            <div th:if="${(tasks.getStatusTask() eq  tasks.getStatusTask().COMPLETED)}">
+                                <a type="button" class="btn btn-sm btn-success" id="closeTask"
+                                   th:href="'/task/closeTask/'+${tasks.id}">Закрыть</a>
+                            </div>
+                        </div>
+                        <div sec:authorize="isAuthenticated() && (hasRole('ADMIN')|| hasRole('MAIN_EXECUTOR'))">
+                            <a th:if="${!tasks.isDeleted()}" class="btn btn-sm btn-outline-danger"
+                               th:href="'/task/delete/' + ${tasks.id}"
+                               onclick="return confirm('Вы действительно хотите удалить заявку?')">Удалить</a>
+                            <a th:if="${tasks.isDeleted()}" class="btn btn-sm btn-outline-warning"
+                               th:href="'/task/restore/' + ${tasks.getId()}">Восстановить</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <nav aria-label="Pagination" th:if="${task.totalPages gt 0}">
+            <ul class="pagination justify-content-center font-weight-bold">
+                <li class="page-item" th:classappend="${task.number eq 0} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/task?page={id}(id=${task.number lt 2 ? 1 : task.number})}"
+                       aria-label="Previous" title="Previous Page" data-toggle="tooltip">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:classappend="${i eq task.number + 1} ? 'active'"
+                    th:each="i : ${#numbers.sequence( 1, task.totalPages, 1)}">
+                    <a class="page-link" th:href="@{/task?page={id}(id=${i})}" th:text="${i}"
+                       th:title="${'Page '+ i}" data-toggle="tooltip"></a>
+                </li>
+                <li class="page-item" th:classappend="${task.number eq task.totalPages - 1} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/task?page={id}(id=${task.number + 2})}"
+                       aria-label="Next" title="Next Page" data-toggle="tooltip">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

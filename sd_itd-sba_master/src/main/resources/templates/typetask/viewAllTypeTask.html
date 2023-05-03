@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Тип заявки</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col">
+            <h4>Типы заявок</h4>
+        </div>
+        <div class="col" sec:authorize="isAuthenticated() && (hasRole('ADMIN'))">
+            <a href="typetask/add"
+               class="btn btn-secondary"
+               role="button"
+               style="float: right"
+               aria-disabled="true">Добавить тип заявки</a>
+        </div>
+    </div>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Названия</th>
+            <th scope="col">SLA</th>
+            <th scope="col"> Пометка на удаления</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="type : ${typeTask}">
+            <td th:text="${type.getId()}"></td>
+            <td th:text="${type.getNameType()}"></td>
+            <td th:text="${type.sla.getNameSLA()}"></td>
+            <td th:text="${type.isDeleted()}"></td>
+            <td>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end"
+                     sec:authorize="isAuthenticated() && (hasRole('ADMIN'))">
+                    <a th:if="${!type.isDeleted()}" class="btn btn-sm btn-outline-danger"
+                       th:href="'/typetask/deleteSoft/' + ${type.id}">Пометка на уд.</a>
+                    <a th:if="${!type.isDeleted()}" class="btn btn-sm btn-danger"
+                       th:href="'/typetask/delete/' + ${type.id}"
+                       onclick="return confirm('Вы действительно хотите полностью удалить?')">Удалить</a>
+                    <a th:if="${type.isDeleted()}" class="btn btn-sm btn-outline-warning"
+                       th:href="'/typetask/restore/' + ${type.id}">Восстановить</a>
+                </div>
+            </td>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

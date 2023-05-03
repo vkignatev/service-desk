@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>SLA</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col">
+            <h4>SLA(Соглашение об уровне обслуживания)</h4>
+        </div>
+        <div class="col" sec:authorize="isAuthenticated() && (hasRole('ADMIN'))">
+            <a href="sla/add"
+               class="btn btn-secondary"
+               role="button"
+               style="float: right"
+               aria-disabled="true">Добавить SLA</a>
+        </div>
+    </div>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Названия</th>
+            <th scope="col">Время реакции (час.)</th>
+            <th scope="col">Время выполнения (час.)</th>
+            <th scope="col"> Пометка на удаления</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="SLAs : ${SLA}">
+            <td th:text="${SLAs.getId()}"></td>
+            <td th:text="${SLAs.getNameSLA()}"></td>
+            <td th:text="${SLAs.getResponseTime()}"></td>
+            <td th:text="${SLAs.getExecutionTime()}"></td>
+            <td th:text="${SLAs.isDeleted()}"></td>
+            <td>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end"
+                     sec:authorize="isAuthenticated() && (hasRole('ADMIN'))">
+                    <a th:if="${!SLAs.isDeleted()}" class="btn btn-sm btn-outline-danger"
+                       th:href="'/sla/deleteSoft/' + ${SLAs.id}">Пометка на уд.</a>
+                    <a th:if="${!SLAs.isDeleted()}" class="btn btn-sm btn-danger"
+                       th:href="'/sla/delete/' + ${SLAs.id}"
+                       onclick="return confirm('Вы действительно хотите полностью удалить?')">Удалить</a>
+                    <a th:if="${SLAs.isDeleted()}" class="btn btn-sm btn-outline-warning"
+                       th:href="'/sla/restore/' + ${SLAs.id}">Восстановить</a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

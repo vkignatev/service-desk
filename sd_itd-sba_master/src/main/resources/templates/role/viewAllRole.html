@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Роли</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col">
+            <h4>Роли пользователей (системные настройки)</h4>
+        </div>
+<!--        <div class="col">-->
+<!--            <a href="role/add"-->
+<!--               class="btn btn-secondary"-->
+<!--               role="button"-->
+<!--               style="float: right"-->
+<!--               aria-disabled="true">Добавить роль</a>-->
+<!--        </div>-->
+    </div>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Роль</th>
+            <th scope="col">Описания</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="role : ${roles}">
+            <td th:text="${role.getId()}"></td>
+            <td th:text="${role.getNameRole()}"></td>
+            <td th:text="${role.getDescription()}"></td>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

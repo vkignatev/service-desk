@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование профиля</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h3 class="mt-3 mb-3" th:text="'Редактировать профиль: ' + ${userForm.getFirstName()}+ ' '
+     + ${userForm.getLastName()} +' (логин: '+${userForm.getLogin()}+ ')'">Редактировать профиль</h3>
+    <form method="POST" class="needs-validation" novalidate style="max-width: 50vw" th:action="@{/users/profile/update}"
+          th:object="${userForm}">
+        <input type="hidden" name="id"
+               th:value="${userForm.getId()}">
+        <!--        <div class="mt-3 row g-2">-->
+        <!--            <div class="col-md">-->
+        <!--                <div class="form-floating">-->
+        <!--                    <input name="login" readonly type="text" th:value="${userForm.getLogin()}" class="form-control" id="login" placeholder="Введите логин" required>-->
+        <!--                    <label for="login">Логин</label>-->
+        <!--                    <div class="invalid-feedback">Обязательное поле для заполнения</div>-->
+        <!--                    <div class="alert alert-danger" th:if="${#fields.hasErrors('login')}">-->
+        <!--                        <p th:errors="*{login}"></p>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+        <div class="mt-3 row g-2">
+            <div class="col-md">
+                <div class="form-floating">
+                    <input name="lastName" type="text" th:value="${userForm.getLastName()}" class="form-control"
+                           id="lastName" placeholder="Введите фамилию" required>
+                    <label for="lastName">Фамилия</label>
+                    <div class="invalid-feedback">Обязательное поле для заполнения</div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating">
+                    <input name="firstName" th:value="${userForm.getFirstName()}" type="text" class="form-control"
+                           id="firstName" placeholder="Введите имя" required>
+                    <label for="firstName">Имя</label>
+                    <div class="invalid-feedback">Обязательное поле для заполнения</div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating">
+                    <input name="middleName" th:value="${userForm.getMiddleName()}" type="text" class="form-control"
+                           id="middleName" placeholder="Введите отчество">
+                    <label for="middleName">Отчество</label>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3 row g-2">
+            <div class="col-md">
+                <div class="form-floating">
+                    <input name="email" th:value="${userForm.getEmail()}" type="email" class="form-control" id="email"
+                           placeholder="Введите email" required>
+                    <label for="email">Email</label>
+                    <div class="invalid-feedback">Обязательное поле для заполнения</div>
+                    <div class="alert alert-danger" th:if="${#fields.hasErrors('email')}">
+                        <p th:errors="*{email}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating">
+                    <input name="phone" type="text" th:value="${userForm.getPhone()}" class="form-control" id="phone"
+                           placeholder="Введите телефон">
+                    <label for="phone">Телефон</label>
+                    <div class="invalid-feedback">Обязательное поле для заполнения</div>
+                </div>
+            </div>
+            <div class="mt-3 row g-2">
+<!--                <div sec:authorize="isAuthenticated() && hasRole('ADMIN')" class="mt-3 row g-2">-->
+                <div class="col-md">
+                    <div class="form-floating">
+                        <select class="form-select" name="groupId" id="groupId">
+<!--                            <option selected value="default">Выберите группу</option>-->
+                            <option th:each="group : ${groupForm}"
+                                    th:if="${!group.isDeleted()}"
+                                    th:value="${group.getId()}" th:text="${group.getResponsible()}"
+                                    th:selected="${group.getId() eq userForm.getGroupId()}"></option>
+                            <!--                        <div class="invalid-feedback">Обязательное поле для заполнения</div>-->
+                        </select>
+                        <label for="groupId">Группа пользователей</label>
+                    </div>
+                </div>
+<!--                <div class="col-md">-->
+<!--                    <div class="form-floating">-->
+<!--                        <select class="form-select" name="group" id="role">-->
+<!--                            <option selected value="default">Выберите роль пользователя (в разрабоки)</option>-->
+<!--                        </select>-->
+<!--                        <label for="role">Роль пользователя</label>-->
+<!--                    </div>-->
+<!--                </div>-->
+            </div>
+            <div  class="mt-3 row g-2">
+                <div class="col-md">
+                    <div class="form-floating">
+                        <select class="form-select" name="locationId" id="locationId">
+                            <option selected value="default">Выберите площадку</option>
+                            <option th:each="location : ${locationForm}"
+                                    th:if="${!location.isDeleted()}"
+                                    th:value="${location.getId()}" th:text="${location.getNameLocation()}"
+                                    th:selected="${location.getId() eq userForm.getLocationId()}"></option>
+                            <!--                        <div class="invalid-feedback">Обязательное поле для заполнения</div>-->
+                        </select>
+                        <label for="locationId">Площадки</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3 row g-2">
+            <button type="submit" class="btn btn-primary" onclick="validateForm()">Сохранить</button>
+            <button type="button" class="btn btn-secondary" onclick="window.history.back()">Назад</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

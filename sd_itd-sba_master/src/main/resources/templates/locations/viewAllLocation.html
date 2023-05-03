@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Площадки</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col">
+            <h4>Площадки</h4>
+        </div>
+        <div class="col" sec:authorize="isAuthenticated() && (hasRole('ADMIN'))">
+            <a href="locations/add"
+               class="btn btn-secondary"
+               role="button"
+               style="float: right"
+               aria-disabled="true">Добавить площадку</a>
+        </div>
+    </div>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Названия</th>
+            <th scope="col">Пометка на удаления</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="location : ${locations}">
+            <td th:text="${location.getId()}"></td>
+            <td th:text="${location.getNameLocation()}"></td>
+            <td th:text="${location.isDeleted()}"></td>
+            <td>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end"
+                     sec:authorize="isAuthenticated() && (hasRole('ADMIN'))">
+                    <a th:if="${!location.isDeleted()}" class="btn btn-sm btn-outline-danger"
+                       th:href="'/locations/deleteSoft/' + ${location.id}">Пометка на уд.</a>
+                    <a th:if="${!location.isDeleted()}" class="btn btn-sm btn-danger"
+                       th:href="'/locations/delete/' + ${location.id}"
+                       onclick="return confirm('Вы действительно хотите полностью удалить?')">Удалить</a>
+                    <a th:if="${location.isDeleted()}" class="btn btn-sm btn-outline-warning"
+                       th:href="'/locations/restore/' + ${location.id}">Восстановить</a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

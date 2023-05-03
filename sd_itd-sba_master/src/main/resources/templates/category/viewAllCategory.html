@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Категории</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col">
+            <h4>Категории заявок</h4>
+        </div>
+        <div class="col" sec:authorize="isAuthenticated() && (hasRole('ADMIN'))">
+            <a href="category/add"
+               class="btn btn-secondary"
+               role="button"
+               style="float: right"
+               aria-disabled="true">Добавить категорию</a>
+        </div>
+    </div>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Названия</th>
+            <th scope="col">Родительская категория</th>
+            <th scope="col"> Пометка на удаления</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="categories : ${category}">
+            <td th:text="${categories.getId()}">#</td>
+            <td th:text="${categories.getNameCategory()}"></td>
+            <td th:text="${categories.getParentCategoryId()}"></td>
+            <td th:text="${categories.isDeleted()}"></td>
+            <td>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end"
+                     sec:authorize="isAuthenticated() && (hasRole('ADMIN'))">
+                    <a th:if="${!categories.isDeleted()}" class="btn btn-sm btn-outline-danger"
+                       th:href="'/category/deleteSoft/' + ${categories.getId()}">Пометка на уд.</a>
+                    <a th:if="${!categories.isDeleted()}" class="btn btn-sm btn-danger"
+                       th:href="'/category/delete/' + ${categories.getId()}"
+                       onclick="return confirm('Вы действительно хотите полностью удалить?')">Удалить</a>
+                    <a th:if="${categories.isDeleted()}" class="btn btn-sm btn-outline-warning"
+                       th:href="'/category/restore/' + ${categories.getId()}">Восстановить</a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
